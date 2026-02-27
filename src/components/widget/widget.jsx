@@ -3,11 +3,17 @@ import calendarSVG from '../../assets/images/calendarSVG.svg'
 import downloadsSVG from '../../assets/images/downloadSVG.svg'
 import Divider from "../divider/divider.jsx";
 import Button from "../button/button.jsx";
+import {useDispatch} from "react-redux";
+import {openModal} from "../../store/actions/modalActions.js";
+import {formattedPublishDate} from "../../common.js";
 const Widget = ({data}) => {
-    const {name, description, publishDate, downloads} = data
+    const {name, description, downloads} = data
+    const publishDate = formattedPublishDate(data.publishDate)
+    const dispatch = useDispatch()
 
     const customizeWidget = () => {
-
+        // open modal with widget data as payload
+        dispatch(openModal({ widget: data }))
     }
 
     return (
@@ -25,7 +31,7 @@ const Widget = ({data}) => {
             <section className="widget-footer">
                 <div className="meta-data">
                     <img src={calendarSVG} alt="" className="svg-icon"/>
-                    <p>{publishDate}</p>
+                    <p title={String(publishDate)}>{publishDate}</p>
                 </div>
                 <div className="meta-data">
                     <img src={downloadsSVG} alt="" className="svg-icon"/>

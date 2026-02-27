@@ -1,7 +1,7 @@
 .aside {
   width: 200px;
-  flex-grow: 1;
   background: #EDE5A6;
+  margin-right: 2rem;
 }
 
 .aside-item {

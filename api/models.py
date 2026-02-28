@@ -9,6 +9,7 @@ class Widget(Model):
     description = models.TextField()
     downloads = models.IntegerField(default=0)
     publishDate = models.DateTimeField(auto_now_add=True)
+    version = models.CharField(max_length=20, default='1.0.0')
 
     def __str__(self):
-        return self.name
+        return self.name + " v" + self.version

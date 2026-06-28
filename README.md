@@ -1,121 +1,209 @@
-# Composable Clinical Intelligence
-### A FHIR-Based Marketplace for Predictive Micro-Frontend Widgets Integrable into Existing EHR Systems
+This branch shows how to configure the HAPI FHIR server.
 
 ## Quick Start Guide
 
-If you want to quickly get the project up and running, here are the steps to follow:
-1. Switch branch to "smart-auth-microfrontend-demo" and follow the README there.
-2. Switch branch to "ai-models-backend" and follow the README there.
-3. Switch branch to "widgets-backend" and follow the README there.
+1. Clone the official HAPI FHIR JPA Server:
+   ```bash
+   git clone https://github.com/hapifhir/hapi-fhir-jpaserver-starter.git
+   cd hapi-fhir-jpaserver-starter
+   
+FHIR base URL:
 
-## 📌 Overview
+http://localhost:8080/fhir
 
-This project presents an interoperability-centered architecture designed to extend Clinical Decision Support Systems (CDSS) through composable, FHIR-compatible micro-frontend widgets.
+Verify the server is running:
 
-Rather than focusing solely on predictive modeling, the core contribution of this work lies in enabling seamless, vendor-agnostic integration of clinical intelligence into existing Electronic Health Record (EHR) systems.
+http://localhost:8080/fhir/metadata
 
-The proposed solution takes the form of a **FHIR-native widget marketplace**, where lightweight, browser-embedded components can be integrated into any web-based CDSS with minimal friction.
 
----
-
-## 🎯 Core Contribution
-
-Modern healthcare infrastructures often struggle to integrate predictive models into EHR systems due to:
-
-- Vendor lock-in
-- Proprietary architectures
-- High deployment complexity
-- Tight coupling between decision logic and EHR systems
-
-This work addresses these limitations by introducing:
-
-- ✅ A composable micro-frontend architecture
-- ✅ Standards-based FHIR data retrieval
-- ✅ SMART-on-FHIR interoperability
-- ✅ OAuth2-secured patient-scoped access
-- ✅ Decoupled predictive intelligence
-- ✅ Version-controlled, health-checked deployment
-- ✅ Scalable orchestration layer
-
-The result is a **plug-and-play clinical intelligence delivery model**.
-
----
-
-## 🏗 Architecture
-
-The system consists of:
-
-1. **Frontend Marketplace**
-    - React-based UI
-    - Allows browsing and configuring available widgets
-    - Customizable FHIR base URL and display settings
-
-2. **Micro-Frontend Widgets**
-    - Embedded via simple HTML snippet
-    - Self-contained and browser-native
-    - Retrieve patient data via FHIR R4 endpoints
-    - Communicate with backend for inference
-
-3. **Backend (Django + DRF)**
-    - Provides versioning and health-check system
-    - Manages widget lifecycle
-    - Exposes REST APIs for inference routing
-
-4. **Orchestration Layer**
-    - Load-balanced model services
-    - Scalable container-based deployment
-    - High availability and horizontal scaling
-
----
-
-## 🔗 Interoperability Validation
-
-The solution demonstrates full SMART-on-FHIR interoperability by:
-
-- Launching inside a standards-compliant SMART sandbox
-- Retrieving patient-scoped FHIR R4 data
-- Performing OAuth2-secured requests
-- Executing model inference without EHR-specific coupling
-
-This confirms that predictive components can operate independently of monolithic EHR systems while maintaining standards compliance.
-
----
-
-## 🧠 Proof-of-Concept Widgets
-
-To validate the architectural paradigm, a minimal set of predictive widgets was implemented, including:
-
-- **Heart Attack Risk Predictor**
-
-The implemented models achieved:
-- AUC: 0.78
-- F1-score: 0.70
-
-These results serve as feasibility validation of the deployment model rather than the primary scientific contribution.
-
----
-
-## 🚀 Key Innovation
-
-This project shifts the focus from **model-centric CDSS development** toward **infrastructure-centric clinical intelligence delivery**.
-
-It demonstrates that predictive decision support can be:
-
-- Modular
-- Reusable
-- Interoperable
-- Vendor-agnostic
-- Scalable
-- Decoupled from proprietary EHR systems
-
----
-
-## 🔮 Future Directions
-
-- Expansion of the widget ecosystem
-- Third-party developer onboarding under strict validation rules
-- Alert fatigue mitigation mechanisms
-- Governance and security framework for marketplace scaling
-- Validation across multiple real-world EHR deployments
-
----
+2. Force the usage of PostgreSQL instead of H2 by editing the `docker-compose.yml` file:
+    ```yaml
+    services:
+      hapi-fhir-jpaserver-start:
+        build: .
+        container_name: hapi-fhir-jpaserver-start
+        restart: on-failure
+        environment:
+          SPRING_DATASOURCE_URL: "jdbc:postgresql://hapi-fhir-postgres:5432/hapi"
+          SPRING_DATASOURCE_USERNAME: "admin"
+          SPRING_DATASOURCE_PASSWORD: "admin"
+          SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
+          # Explicitly override the Hibernate dialect via native Spring Boot property
+          SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgresDialect"
+        ports:
+          - "8080:8080"
+        depends_on:
+          hapi-fhir-postgres:
+            condition: service_healthy
+    
+      hapi-fhir-postgres:
+        image: postgres:16-alpine
+        container_name: hapi-fhir-postgres
+        restart: always
+        environment:
+          POSTGRES_DB: "hapi"
+          POSTGRES_USER: "admin"
+          POSTGRES_PASSWORD: "admin"
+        healthcheck:
+          test: ["CMD-SHELL", "sh -c 'pg_isready -U admin -d hapi' || exit 1"]
+          interval: 10s
+          timeout: 5s
+          start_period: 5s
+          retries: 5
+        volumes:
+          - hapi-fhir-postgres:/var/lib/postgresql/data
+    
+    volumes:
+      hapi-fhir-postgres:
+   
+3. Start the server using Docker Compose:
+   ```bash
+    docker-compose up
+4. Add hard-coded data (regarding a patient) for development and testing purposes:
+    ```
+   POST (http://localhost:8080/fhir)
+   {
+      "resourceType": "Bundle",
+      "type": "transaction",
+      "entry": [
+        {
+          "fullUrl": "http://localhost:8080/fhir/Patient/pat-1000",
+          "resource": {
+            "resourceType": "Patient",
+            "id": "pat-1000",
+            "active": true,
+            "name": [
+              {
+                "use": "official",
+                "family": "Doe",
+                "given": [
+                  "John"
+                ]
+              }
+            ],
+            "gender": "male",
+            "birthDate": "1971-06-28"
+          },
+          "request": {
+            "method": "PUT",
+            "url": "Patient/pat-1000"
+          }
+        }
+      ]
+    }
+5. Add hard-coded observation for the previously added patient:
+    ```
+   POST (http://localhost:8080/fhir)
+    {
+      "resourceType": "Bundle",
+      "type": "transaction",
+      "entry": [
+        {
+          "fullUrl": "http://localhost:8080/fhir/Patient/pat-1000",
+          "resource": {
+            "resourceType": "Patient",
+            "id": "pat-1000",
+            "active": true,
+            "name": [
+              {
+                "use": "official",
+                "family": "Doe",
+                "given": [
+                  "John"
+                ]
+              }
+            ]
+          },
+          "request": {
+            "method": "PUT",
+            "url": "Patient/pat-1000"
+          }
+        },
+        {
+          "fullUrl": "urn:uuid:cholesterol-001",
+          "resource": {
+            "resourceType": "Observation",
+            "status": "final",
+            "category": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                    "code": "laboratory",
+                    "display": "Laboratory"
+                  }
+                ]
+              }
+            ],
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "2093-3",
+                  "display": "Total Cholesterol"
+                }
+              ],
+              "text": "chol"
+            },
+            "subject": {
+              "reference": "Patient/pat-1000"
+            },
+            "valueQuantity": {
+              "value": 233,
+              "unit": "mg/dL",
+              "system": "http://unitsofmeasure.org",
+              "code": "mg/dL"
+            }
+          },
+          "request": {
+            "method": "POST",
+            "url": "Observation"
+          }
+        },
+        {
+          "fullUrl": "urn:uuid:bloodpressure-001",
+          "resource": {
+            "resourceType": "Observation",
+            "status": "final",
+            "category": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                    "code": "vital-signs",
+                    "display": "Vital Signs"
+                  }
+                ]
+              }
+            ],
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8480-6",
+                  "display": "Systolic blood pressure"
+                }
+              ],
+              "text": "tresbps"
+            },
+            "subject": {
+              "reference": "Patient/pat-1000"
+            },
+            "valueQuantity": {
+              "value": 130,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            }
+          },
+          "request": {
+            "method": "POST",
+            "url": "Observation"
+          }
+        }
+      ]
+    }
+6. Verify that the data got added successfully by performing a GET request to retrieve the patient and their observations:
+   ```
+   GET (http://localhost:8080/fhir/Observation?subject=Patient/pat-1000)
+   ```

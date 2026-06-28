@@ -190,7 +190,7 @@ const heartAttackObj = {
     pollIntervalId: null, // Store interval ID globally
     measureTimeIntervalId: null, // Store measureTime interval ID globally
     lastPoll: 0, // Track seconds since last poll
-    version: "1.0.1", // Version info for health checking
+    version: "1.0.0", // Version info for health checking
     fhirAdapter: onPredictClick, // Expose the main function for external calls
     healthCheck: checkHealth, // Expose health check function
     predictorsURL: "http://localhost:8000/predict/heart-attack/", // URL for model predictions

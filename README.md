@@ -1,6 +1,13 @@
 # Composable Clinical Intelligence
 ### A FHIR-Based Marketplace for Predictive Micro-Frontend Widgets Integrable into Existing EHR Systems
 
+## Quick Start Guide
+
+If you want to quickly get the project up and running, here are the steps to follow:
+1. Switch branch to "smart-auth-microfrontend-demo" and follow the README there.
+2. Switch branch to "ai-models-backend" and follow the README there.
+3. Switch branch to "widgets-backend" and follow the README there.
+
 ## 📌 Overview
 
 This project presents an interoperability-centered architecture designed to extend Clinical Decision Support Systems (CDSS) through composable, FHIR-compatible micro-frontend widgets.

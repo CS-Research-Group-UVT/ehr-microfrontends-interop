@@ -2,21 +2,7 @@
 
 ## 1. Start HAPI FHIR Server
 
-Clone the official HAPI FHIR JPA Server:
-
-``` bash
-git clone https://github.com/hapifhir/hapi-fhir-jpaserver-starter.git
-cd hapi-fhir-jpaserver-starter
-docker compose up
-```
-
-FHIR base URL:
-
-http://localhost:8080/fhir
-
-Verify the server is running:
-
-http://localhost:8080/fhir/metadata
+Switch branch to "hapi-fhir-configuration" and follow the README there.
 
 ------------------------------------------------------------------------
 

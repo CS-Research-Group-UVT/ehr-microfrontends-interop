@@ -32,8 +32,8 @@ Configure:
 
 -   App Launch URL: http://localhost:5174/
 -   FHIR Version: R4
--   Select a test patient (1000 for demo purposes)
--   Launch type: Patient Portal Launch
+-   Select a test patient (pat-1000 for demo purposes)
+-   Launch type: Provider EHR Launch
 -   Check "Simulate launch within the EHR UI"
 
 Click **Launch Sample App**.

@@ -1,6 +1,10 @@
 # Composable Clinical Intelligence
 ### A FHIR-Based Marketplace for Predictive Micro-Frontend Widgets Integrable into Existing EHR Systems
 
+## Demo Video
+
+If you want to get up to speed with this repo, watch [this](https://drive.google.com/file/d/1yCRVooStOor_50FE0D17XgLd4UwluX2b/view?usp=drive_link) demo video.
+
 ## Quick Start Guide
 
 If you want to quickly get the project up and running, here are the steps to follow:
